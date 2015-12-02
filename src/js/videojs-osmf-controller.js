@@ -42,7 +42,7 @@ var readWrite = ['preload', 'defaultPlaybackRate', 'playbackRate', 'autoplay',
     'loop', 'mediaGroup', 'controller', 'controls', 'volume', 'muted',
     'defaultMuted'];
 var readOnly = ['error', 'networkState', 'readyState', 'seeking', 'duration',
-    'initialTime', 'startOffsetTime', 'paused', 'played', 'seekable', 'ended',
+    'initialTime', 'startOffsetTime', 'paused', 'played', 'ended',
     'videoTracks', 'audioTracks', 'videoWidth', 'videoHeight', 'textTracks'];
 
 var createSetter = function(attr){
