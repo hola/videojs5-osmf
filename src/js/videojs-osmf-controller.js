@@ -1,6 +1,6 @@
-'use strict';
-/*jshint browser:true, es5:true*/
 (function(window, videojs, document, undefined){
+'use strict';
+/*jshint browser:true*/
 
 var Flash = videojs.getComponent('Flash');
 
