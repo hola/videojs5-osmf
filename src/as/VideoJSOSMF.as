@@ -136,7 +136,8 @@ public class VideoJSOSMF extends Sprite {
 
   private function ready():void {
     if (loaderInfo.parameters['readyFunction']) {
-      ExternalInterface.call(loaderInfo.parameters['readyFunction'], ExternalInterface.objectID);
+      var cb = loaderInfo.parameters['readyFunction'];
+      ExternalInterface.call("function(func, id){ videojs.getComponent('Osmf')[func](id); }", cb, ExternalInterface.objectID);
     }
   }
 
@@ -612,12 +613,14 @@ public class VideoJSOSMF extends Sprite {
   // VideoJS Notifications
   private function dispatchExternalEvent(type:String, data:Object = null):void {
     if (loaderInfo.parameters['eventProxyFunction']) {
-      ExternalInterface.call(loaderInfo.parameters['eventProxyFunction'], ExternalInterface.objectID, type.toLowerCase());
+      var cb = loaderInfo.parameters['eventProxyFunction'];
+      ExternalInterface.call("function(func, id, type){ videojs.getComponent('Osmf')[func](id, type); }", cb, ExternalInterface.objectID, type.toLowerCase());
     }
   }
   private function dispatchExternalErrorEvent(type:String, error:Object):void {
     if(loaderInfo.parameters['errorEventProxyFunction']) {
-      ExternalInterface.call(loaderInfo.parameters['errorEventProxyFunction'], ExternalInterface.objectID, type.toLowerCase(), error);
+      var cb = loaderInfo.parameters['eventProxyFunction'];
+      ExternalInterface.call("function(func, id, type, err){ videojs.getComponent('Osmf')[func](id, type, err); }", cb, ExternalInterface.objectID, type.toLowerCase(), error);
     }
   }
 
