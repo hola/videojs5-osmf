@@ -4,40 +4,40 @@
 
 var Flash = videojs.getComponent('Flash');
 
-videojs.Osmf = Flash.extend({
-    init: function(options, ready){
+var Osmf = videojs.extend(Flash, {
+    constructor: function(options, ready){
         var source = options.source;
         var _player = videojs(options.playerId);
         _player.osmf = this;
         options.flashVars = {
             'playerId': options.playerId,
-            'readyFunction': 'videojs.Osmf.onReady',
-            'eventProxyFunction': 'videojs.Osmf.onEvent',
-            'errorEventProxyFunction': 'videojs.Osmf.onError'
+            'readyFunction': 'onReady',
+            'eventProxyFunction': 'onEvent',
+            'errorEventProxyFunction': 'onError'
         };
         Flash.call(this, options, ready);
         this.firstplay = false;
         this.loadstart = false;
-        _player.on('loadeddata', videojs.Osmf.onLoadedData);
-        _player.on('ended', videojs.Osmf.onEnded);
+        _player.on('loadeddata', Osmf.onLoadedData);
+        _player.on('ended', Osmf.onEnded);
         options.source = source;
     }
 });
 
-videojs.Osmf.formats = {
+Osmf.formats = {
     'application/adobe-f4m': 'F4M',
     'application/adobe-f4v': 'F4V',
     'application/dash+xml': 'MPD'
 };
 
-videojs.Osmf.canPlaySource = function(src){
+Osmf.canPlaySource = function(src){
     var type = src.type.replace(/;.*/, '').toLowerCase();
-    return type in videojs.Osmf.formats ? 'maybe' : '';
+    return type in Osmf.formats ? 'maybe' : '';
 };
 
-videojs.Osmf.log_enabled = false;
+Osmf.log_enabled = false;
 
-var api = videojs.Osmf.prototype;
+var api = Osmf.prototype;
 var readWrite = ['preload', 'defaultPlaybackRate', 'playbackRate', 'autoplay',
     'loop', 'mediaGroup', 'controller', 'controls', 'volume', 'muted',
     'defaultMuted'];
@@ -72,41 +72,29 @@ var createGetter = function(attr){
         createGetter(readOnly[i]);
 })();
 
-videojs.Osmf.prototype.play = function(){
-    this.el_.vjs_play();
-};
+Osmf.prototype.play = function(){ this.el_.vjs_play(); };
 
-videojs.Osmf.prototype.load = function(){
-    this.el_.vjs_load();
-};
+Osmf.prototype.load = function(){ this.el_.vjs_load(); };
 
-videojs.Osmf.prototype.paused = function(){
-    return this.el_.vjs_paused();
-};
+Osmf.prototype.paused = function(){ return this.el_.vjs_paused(); };
 
-videojs.Osmf.prototype.pause = function(){
-    this.el_.vjs_pause();
-};
+Osmf.prototype.pause = function(){ this.el_.vjs_pause(); };
 
-videojs.Osmf.prototype.currentTime = function(value){
+Osmf.prototype.currentTime = function(value){
     if (!value)
         return this.el_.vjs_getProperty('currentTime');
     this.el_.vjs_setProperty('currentTime');
 };
 
-videojs.Osmf.prototype.streamStatus = function(){
-    return this.el_.streamStatus();
-};
+Osmf.prototype.streamStatus = function(){ return this.el_.streamStatus(); };
 
-videojs.Osmf.isSupported = function(){
-    return Flash.version()[0]>=10;
-};
+Osmf.isSupported = function(){ return Flash.version()[0]>=10; };
 
-videojs.Osmf.onLoadedData = function(){
+Osmf.onLoadedData = function(){
     var player = this;
-    if (player.options().autoplay)
+    if (player.options_.autoplay)
         player.play();
-    else if (player.options().preload)
+    else if (player.options_.preload)
     {
         player.currentTime(0);
         player.play();
@@ -117,14 +105,14 @@ videojs.Osmf.onLoadedData = function(){
     }
 };
 
-videojs.Osmf.onEnded = function(){
+Osmf.onEnded = function(){
     if (this.options().loop)
         this.currentTime(0);
     this.pause();
 };
 
-videojs.Osmf.onReady = function(currentSwf){
-    if (videojs.Osmf.log_enabled)
+Osmf.onReady = function(currentSwf){
+    if (Osmf.log_enabled)
         videojs.log('OSMF', 'Ready', currentSwf);
     Flash.onReady(currentSwf);
     var player = document.getElementById(currentSwf).player;
@@ -132,11 +120,11 @@ videojs.Osmf.onReady = function(currentSwf){
         player.tech.el_.vjs_src(player.currentSrc());
 };
 
-videojs.Osmf.onError = function(currentSwf, err){
+Osmf.onError = function(currentSwf, err){
     var player = document.getElementById(currentSwf).player;
     if (err=='loaderror')
         err = 'srcnotfound';
-    if (videojs.Osmf.log_enabled)
+    if (Osmf.log_enabled)
         videojs.log('OSMF', 'Error', err);
     if (player.tech.options_.reconnectOnError && !player.tech.reconnecting_)
     {
@@ -151,15 +139,15 @@ videojs.Osmf.onError = function(currentSwf, err){
     player.error({code: 4, msg: ""});
 };
 
-videojs.Osmf.onEvent = function(currentSwf, event){
+Osmf.onEvent = function(currentSwf, event){
     var player = document.getElementById(currentSwf).player;
     if (event==='playing' && player.tech.firstplay===false)
     {
-        if (videojs.Osmf.log_enabled)
+        if (Osmf.log_enabled)
             videojs.log('OSMF', 'Event', currentSwf, 'loadstart');
         player.trigger('loadstart');
         player.tech.loadstart = true;
-        if (videojs.Osmf.log_enabled)
+        if (Osmf.log_enabled)
             videojs.log('OSMF', 'Event', currentSwf, 'firstplay');
         player.trigger('firstplay');
         player.tech.firstplay = true;
@@ -169,16 +157,16 @@ videojs.Osmf.onEvent = function(currentSwf, event){
     else if (event=='ready')
         event = 'loadeddata';
     Flash.onEvent(currentSwf, event);
-    if (event!=='timeupdate' && videojs.Osmf.log_enabled)
+    if (event!=='timeupdate' && Osmf.log_enabled)
         videojs.log('OSMF', 'Event', currentSwf, event);
 };
 
-videojs.Osmf.prototype.supportsFullScreen = function(){ return false; };
+Osmf.prototype.supportsFullScreen = function(){ return false; };
 
-videojs.Osmf.prototype.enterFullScreen = function(){ return false; };
+Osmf.prototype.enterFullScreen = function(){ return false; };
 
 videojs.options.osmf = {};
-
 videojs.options.techOrder.push('osmf');
+videojs.registerComponent('Osmf', Osmf);
 
 })(window, window.videojs, document);
