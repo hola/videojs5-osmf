@@ -96,7 +96,8 @@ Osmf.onLoadedData = function(){
         player.play();
     else if (player.options_.preload)
     {
-        player.currentTime(0);
+        if (player.currentTime())
+            player.currentTime(0);
         player.play();
         player.pause();
         player.bigPlayButton.show();
