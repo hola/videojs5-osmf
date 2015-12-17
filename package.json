@@ -1,6 +1,6 @@
 {
   "name": "videojs-osmf",
-  "version": "0.0.0",
+  "version": "0.0.0-19",
   "description": "A Video.js media controller for OSMF",
   "main": "videojs-osmf.js",
   "scripts": {
