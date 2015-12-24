@@ -43,7 +43,8 @@ var readWrite = ['preload', 'defaultPlaybackRate', 'playbackRate', 'autoplay',
     'defaultMuted'];
 var readOnly = ['error', 'networkState', 'readyState', 'seeking', 'duration',
     'initialTime', 'startOffsetTime', 'paused', 'played', 'ended',
-    'videoTracks', 'audioTracks', 'videoWidth', 'videoHeight', 'textTracks'];
+    'videoTracks', 'audioTracks', 'videoWidth', 'videoHeight', 'textTracks',
+    'streamType'];
 
 var createSetter = function(attr){
     var attrUpper = attr.charAt(0).toUpperCase()+attr.slice(1);
@@ -140,23 +141,30 @@ Osmf.onError = function(currentSwf, err){
     player.error({code: 4, msg: ""});
 };
 
-Osmf.onEvent = function(currentSwf, event){
+Osmf.onEvent = function(currentSwf, event, data){
     var player = document.getElementById(currentSwf).player;
-    if (event==='playing' && player.tech.firstplay===false)
+    switch (event)
     {
-        if (Osmf.log_enabled)
-            videojs.log('OSMF', 'Event', currentSwf, 'loadstart');
-        player.trigger('loadstart');
-        player.tech.loadstart = true;
-        if (Osmf.log_enabled)
-            videojs.log('OSMF', 'Event', currentSwf, 'firstplay');
-        player.trigger('firstplay');
-        player.tech.firstplay = true;
-    }
-    if (event=='buffering')
+    case 'playing':
+        if (player.tech.firstplay===false)
+        {
+            if (Osmf.log_enabled)
+                videojs.log('OSMF', 'Event', currentSwf, 'loadstart');
+            player.trigger('loadstart');
+            player.tech.loadstart = true;
+            if (Osmf.log_enabled)
+                videojs.log('OSMF', 'Event', currentSwf, 'firstplay');
+            player.trigger('firstplay');
+            player.tech.firstplay = true;
+        }
+        break;
+    case 'buffering':
         event = 'waiting';
-    else if (event=='ready')
+        break;
+    case 'ready':
         event = 'loadeddata';
+        break;
+    }
     Flash.onEvent(currentSwf, event);
     if (event!=='timeupdate' && Osmf.log_enabled)
         videojs.log('OSMF', 'Event', currentSwf, event);

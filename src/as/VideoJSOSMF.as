@@ -40,6 +40,7 @@ import org.osmf.net.StreamingURLResource;
 import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.TimeTrait;
+import org.osmf.traits.LoadTrait;
 import org.osmf.utils.TimeUtil;
 import org.osmf.utils.Version;
 
@@ -390,7 +391,7 @@ public class VideoJSOSMF extends Sprite {
     switch (event.type) {
       case MediaElementEvent.METADATA_ADD:
         Console.log('MetaData Add', event.metadata);
-        dispatchExternalEvent('loadedmetadata');
+        dispatchExternalEvent('loadedmetadata', {ns: event.namespaceURL, metadata: event.metadata});
         break;
 
       case MediaElementEvent.METADATA_REMOVE:
@@ -480,6 +481,11 @@ public class VideoJSOSMF extends Sprite {
 
       case 'muted':
         return (_mediaPlayer) ? _mediaPlayer.muted : false;
+        break;
+
+      case 'streamType':
+        var loadTrait:LoadTrait = _mediaPlayer.media.getTrait(MediaTraitType.LOAD) as LoadTrait;
+        return (loadTrait.resource as StreamingURLResource).streamType;
         break;
 
       case 'volume':
@@ -614,7 +620,7 @@ public class VideoJSOSMF extends Sprite {
   private function dispatchExternalEvent(type:String, data:Object = null):void {
     if (loaderInfo.parameters['eventProxyFunction']) {
       var cb = loaderInfo.parameters['eventProxyFunction'];
-      ExternalInterface.call("function(func, id, type){ videojs.getComponent('Osmf')[func](id, type); }", cb, ExternalInterface.objectID, type.toLowerCase());
+      ExternalInterface.call("function(func, id, type, data){ videojs.getComponent('Osmf')[func](id, type, data); }", cb, ExternalInterface.objectID, type.toLowerCase(), data);
     }
   }
   private function dispatchExternalErrorEvent(type:String, error:Object):void {
