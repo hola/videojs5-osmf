@@ -41,10 +41,9 @@ var api = Osmf.prototype;
 var readWrite = ['preload', 'defaultPlaybackRate', 'playbackRate', 'autoplay',
     'loop', 'mediaGroup', 'controller', 'controls', 'volume', 'muted',
     'defaultMuted'];
-var readOnly = ['error', 'networkState', 'readyState', 'seeking', 'duration',
-    'initialTime', 'startOffsetTime', 'paused', 'played', 'ended',
-    'videoTracks', 'audioTracks', 'videoWidth', 'videoHeight', 'textTracks',
-    'streamType'];
+var readOnly = ['error', 'networkState', 'readyState', 'seeking', 'textTracks',
+    'videoWidth', 'startOffsetTime', 'paused', 'played', 'ended', 'streamType',
+    'videoTracks', 'audioTracks', 'initialTime', 'videoHeight'];
 
 var createSetter = function(attr){
     var attrUpper = attr.charAt(0).toUpperCase()+attr.slice(1);
@@ -72,6 +71,11 @@ var createGetter = function(attr){
     for (i = 0; i<readOnly.length; i++)
         createGetter(readOnly[i]);
 })();
+
+Osmf.prototype.duration = function(){
+    return this.el_ ? (this.streamType() == 'live' ? Infinity :
+        this.el_.vjs_getProperty('duration')) : 0;
+};
 
 Osmf.prototype.play = function(){ this.el_.vjs_play(); };
 
