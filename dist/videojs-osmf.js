@@ -99,7 +99,7 @@ Osmf.onLoadedData = function(){
     var player = this;
     if (player.options_.autoplay)
         player.play();
-    else if (player.options_.preload)
+    else if (player.options_.preload && player.options_.preload!=='none')
     {
         if (player.currentTime())
             player.currentTime(0);
