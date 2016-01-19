@@ -11,20 +11,6 @@ import flash.ui.ContextMenu;
 import flash.ui.ContextMenuItem;
 
 import org.osmf.containers.MediaContainer;
-import org.osmf.events.AudioEvent;
-import org.osmf.events.BufferEvent;
-import org.osmf.events.DRMEvent;
-import org.osmf.events.DisplayObjectEvent;
-import org.osmf.events.DynamicStreamEvent;
-import org.osmf.events.LoadEvent;
-import org.osmf.events.MediaElementEvent;
-import org.osmf.events.MediaErrorEvent;
-import org.osmf.events.MediaFactoryEvent;
-import org.osmf.events.MediaPlayerCapabilityChangeEvent;
-import org.osmf.events.MediaPlayerStateChangeEvent;
-import org.osmf.events.PlayEvent;
-import org.osmf.events.SeekEvent;
-import org.osmf.events.TimeEvent;
 import org.osmf.layout.HorizontalAlign;
 import org.osmf.layout.LayoutMetadata;
 import org.osmf.layout.LayoutTargetEvent;
@@ -37,10 +23,9 @@ import org.osmf.media.MediaPlayer;
 import org.osmf.media.MediaPlayerState;
 import org.osmf.net.StreamType;
 import org.osmf.net.StreamingURLResource;
-import org.osmf.traits.DisplayObjectTrait;
-import org.osmf.traits.MediaTraitType;
-import org.osmf.traits.TimeTrait;
-import org.osmf.traits.LoadTrait;
+import org.osmf.traits.*;
+import org.osmf.events.*;
+import org.osmf.elements.F4MElement;
 import org.osmf.utils.TimeUtil;
 import org.osmf.utils.Version;
 
@@ -598,7 +583,8 @@ public class VideoJSOSMF extends Sprite {
 
   private function onPausedCalled():Boolean {
     Console.log('Paused called on OSMF');
-    return _mediaPlayer.paused;
+    var playTrait: PlayTrait = _mediaPlayer.media.getTrait(MediaTraitType.PLAY) as PlayTrait;
+    return _mediaPlayer.canPlay ? (_mediaPlayer.canPlay && playTrait && playTrait.playState == PlayState.STOPPED);
   }
 
   private function onResumeCalled():void {
