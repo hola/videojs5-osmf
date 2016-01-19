@@ -584,7 +584,7 @@ public class VideoJSOSMF extends Sprite {
   private function onPausedCalled():Boolean {
     Console.log('Paused called on OSMF');
     var playTrait: PlayTrait = _mediaPlayer.media.getTrait(MediaTraitType.PLAY) as PlayTrait;
-    return _mediaPlayer.canPlay ? (_mediaPlayer.canPlay && playTrait && playTrait.playState == PlayState.STOPPED);
+    return _mediaPlayer.canPlay ? (playTrait.playState == PlayState.STOPPED || playTrait.playState == PlayState.PAUSED) : true;
   }
 
   private function onResumeCalled():void {
