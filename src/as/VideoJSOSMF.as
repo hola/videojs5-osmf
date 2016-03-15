@@ -9,7 +9,8 @@ import flash.external.ExternalInterface;
 import flash.system.Security;
 import flash.ui.ContextMenu;
 import flash.ui.ContextMenuItem;
-
+import flash.net.NetStream;
+import org.osmf.events.HTTPStreamingEvent;
 import org.osmf.containers.MediaContainer;
 import org.osmf.layout.HorizontalAlign;
 import org.osmf.layout.LayoutMetadata;
@@ -23,11 +24,13 @@ import org.osmf.media.MediaPlayer;
 import org.osmf.media.MediaPlayerState;
 import org.osmf.net.StreamType;
 import org.osmf.net.StreamingURLResource;
+import org.osmf.net.NetStreamLoadTrait;
 import org.osmf.traits.*;
 import org.osmf.events.*;
 import org.osmf.elements.F4MElement;
 import org.osmf.utils.TimeUtil;
 import org.osmf.utils.Version;
+import org.osmf.net.httpstreaming.HTTPStreamDownloader;
 
 CONFIG::DASH
 import com.castlabs.dash.DashPluginInfo;
@@ -165,6 +168,12 @@ public class VideoJSOSMF extends Sprite {
     _mediaPlayer.addEventListener(DynamicStreamEvent.SWITCHING_CHANGE, onDynamicStreamEvent);
     _mediaPlayer.addEventListener(MediaErrorEvent.MEDIA_ERROR, onMediaErrorEvent);
     _mediaPlayer.addEventListener(DRMEvent.DRM_STATE_CHANGE, onDRMEvent);
+  }
+
+  private function onDownloadComplete(event: HTTPStreamingEvent): void
+  {
+      if (event.downloader.type == HTTPStreamDownloader.INDEX)
+          dispatchExternalEvent('manifestloaded', {url: event.url}); 
   }
 
   private function createMediaElement():void {
@@ -399,6 +408,10 @@ public class VideoJSOSMF extends Sprite {
             Console.log("media size:", dt.mediaWidth, 'x', dt.mediaHeight);
           }
           break;
+	  case MediaTraitType.LOAD:
+              var loadTrait:NetStreamLoadTrait = _mediaPlayer.media.getTrait(MediaTraitType.LOAD) as NetStreamLoadTrait;
+	      loadTrait.addEventListener(LoadEvent.LOAD_STATE_CHANGE, onLoadStateChange);
+	      break;
         }
         break;
 
@@ -406,6 +419,16 @@ public class VideoJSOSMF extends Sprite {
         Console.log('Trait Removed', event.type, event.traitType);
         break;
     }
+  }
+
+  protected function onLoadStateChange(event: LoadEvent): void
+  {
+      if (event.loadState == LoadState.READY)
+      {
+          var loadTrait:NetStreamLoadTrait = _mediaPlayer.media.getTrait(MediaTraitType.LOAD) as NetStreamLoadTrait;
+          var netStream: NetStream = loadTrait.netStream;
+          netStream.addEventListener(HTTPStreamingEvent.DOWNLOAD_COMPLETE, onDownloadComplete);		  
+      }
   }
 
   /* External API Methods */
