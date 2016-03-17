@@ -31,6 +31,12 @@ import org.osmf.elements.F4MElement;
 import org.osmf.utils.TimeUtil;
 import org.osmf.utils.Version;
 import org.osmf.net.httpstreaming.HTTPStreamDownloader;
+import org.osmf.net.DynamicStreamingResource;
+import org.osmf.net.DynamicStreamingItem;
+import org.osmf.metadata.MetadataNamespaces;
+import org.osmf.metadata.Metadata;
+import org.osmf.net.httpstreaming.f4f.HolaFragmentsHelper;
+import org.osmf.elements.f4mClasses.BootstrapInfo;
 
 CONFIG::DASH
 import com.castlabs.dash.DashPluginInfo;
@@ -125,7 +131,7 @@ public class VideoJSOSMF extends Sprite {
 
   private function ready():void {
     if (loaderInfo.parameters['readyFunction']) {
-      var cb = loaderInfo.parameters['readyFunction'];
+      var cb:* = loaderInfo.parameters['readyFunction'];
       ExternalInterface.call("function(func, id){ videojs.getComponent('Osmf')[func](id); }", cb, ExternalInterface.objectID);
     }
   }
@@ -217,7 +223,7 @@ public class VideoJSOSMF extends Sprite {
   }
 
   public function streamStatus():String {
-    var returnValue = "";
+    var returnValue: String = "";
     if (_mediaPlayer && _mediaPlayer.isDynamicStream) {
       returnValue = "==== Stream Status ====" +
       "\nAuto Switching Mode: " + _mediaPlayer.autoDynamicStreamSwitch +
@@ -480,6 +486,25 @@ public class VideoJSOSMF extends Sprite {
 
   }
 
+  private function getLevels(): Array
+  {
+    var loadTrait:LoadTrait = _mediaPlayer.media.getTrait(MediaTraitType.LOAD) as LoadTrait;
+    var resource: DynamicStreamingResource = loadTrait.resource as DynamicStreamingResource;
+    if (!resource)
+      return [];
+    var httpMetadata: Metadata = resource.getMetadataValue(MetadataNamespaces.HTTP_STREAMING_METADATA) as Metadata;
+    var output: Array = [];
+    var helper: HolaFragmentsHelper = new HolaFragmentsHelper();
+    for each (var streamItem: DynamicStreamingItem in resource.streamItems)
+    {
+      var bootstrapInfo: BootstrapInfo = httpMetadata.getValue(MetadataNamespaces.HTTP_STREAMING_BOOTSTRAP_KEY + streamItem.streamName);
+      // in F4M bitrate stored in kilobits per second
+      var bitrate: Number = streamItem.bitrate * 1000;
+      output.push({url: streamItem.streamName, fragments: helper.getListOfFragmentInfo(streamItem.streamName, bootstrapInfo), bitrate: bitrate});
+    }
+    return output;
+  }
+
   private function onGetPropertyCalled(pPropertyName:String):* {
     //Console.log('Get Prop Called', pPropertyName);
     switch (pPropertyName) {
@@ -491,10 +516,15 @@ public class VideoJSOSMF extends Sprite {
         return (_mediaPlayer) ? _mediaPlayer.muted : false;
         break;
 
+      case 'currentLevel':
+        return _mediaPlayer ? _mediaPlayer.currentDynamicStreamIndex : undefined;
+
+      case 'levels':
+        return getLevels();
+
       case 'streamType':
         var loadTrait:LoadTrait = _mediaPlayer.media.getTrait(MediaTraitType.LOAD) as LoadTrait;
         return (loadTrait.resource as StreamingURLResource).streamType;
-        break;
 
       case 'volume':
         return (_mediaPlayer) ? _mediaPlayer.volume : 0;
@@ -628,13 +658,13 @@ public class VideoJSOSMF extends Sprite {
   // VideoJS Notifications
   private function dispatchExternalEvent(type:String, data:Object = null):void {
     if (loaderInfo.parameters['eventProxyFunction']) {
-      var cb = loaderInfo.parameters['eventProxyFunction'];
+      var cb: * = loaderInfo.parameters['eventProxyFunction'];
       ExternalInterface.call("function(func, id, type, data){ videojs.getComponent('Osmf')[func](id, type, data); }", cb, ExternalInterface.objectID, type.toLowerCase(), data);
     }
   }
   private function dispatchExternalErrorEvent(type:String, error:Object):void {
     if(loaderInfo.parameters['errorEventProxyFunction']) {
-      var cb = loaderInfo.parameters['eventProxyFunction'];
+      var cb: * = loaderInfo.parameters['eventProxyFunction'];
       ExternalInterface.call("function(func, id, type, err){ videojs.getComponent('Osmf')[func](id, type, err); }", cb, ExternalInterface.objectID, type.toLowerCase(), error);
     }
   }

@@ -43,7 +43,8 @@ var readWrite = ['preload', 'defaultPlaybackRate', 'playbackRate', 'autoplay',
     'defaultMuted'];
 var readOnly = ['error', 'networkState', 'readyState', 'seeking', 'textTracks',
     'videoWidth', 'startOffsetTime', 'paused', 'played', 'ended', 'streamType',
-    'videoTracks', 'audioTracks', 'initialTime', 'videoHeight'];
+    'videoTracks', 'audioTracks', 'initialTime', 'videoHeight',
+    'currentLevel', 'levels'];
 
 var createSetter = function(attr){
     var attrUpper = attr.charAt(0).toUpperCase()+attr.slice(1);
