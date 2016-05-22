@@ -41,10 +41,9 @@ var api = Osmf.prototype;
 var readWrite = ['preload', 'defaultPlaybackRate', 'playbackRate', 'autoplay',
     'loop', 'mediaGroup', 'controller', 'controls', 'volume', 'muted',
     'defaultMuted'];
-var readOnly = ['error', 'networkState', 'readyState', 'seeking', 'textTracks',
-    'videoWidth', 'startOffsetTime', 'paused', 'played', 'ended', 'streamType',
-    'videoTracks', 'audioTracks', 'initialTime', 'videoHeight',
-    'currentLevel', 'levels'];
+var readOnly = ['error', 'networkState', 'readyState', 'seeking', 'videoWidth',
+    'startOffsetTime', 'paused', 'played', 'ended', 'streamType',
+    'initialTime', 'videoHeight', 'currentLevel', 'levels'];
 
 var createSetter = function(attr){
     var attrUpper = attr.charAt(0).toUpperCase()+attr.slice(1);
