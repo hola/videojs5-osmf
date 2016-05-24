@@ -4,6 +4,7 @@
   "description": "A Video.js media controller for OSMF",
   "main": "videojs-osmf.js",
   "scripts": {
+    "build": "grunt",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
