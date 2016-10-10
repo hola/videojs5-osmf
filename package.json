@@ -1,10 +1,15 @@
 {
-  "name": "videojs-osmf",
-  "version": "0.0.0-32",
+  "name": "@hola.org/videojs-osmf",
+  "version": "0.0.0-33",
   "description": "A Video.js media controller for OSMF",
   "main": "videojs-osmf.js",
   "scripts": {
     "build": "grunt",
+    "login": "c=`npm c ls`; test \"${c#*@hola}\" != \"$c\" || npm login --scope @hola.org",
+    "release": "run-s build login release:*",
+    "release:tag": "git tag v$npm_package_version",
+    "release:publish": "npm publish",
+    "release:pushtags": "git push --tags origin",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -31,6 +36,7 @@
     "grunt-shell": "0.6.1",
     "grunt-concurrent": "0.4.3",
     "load-grunt-tasks": "~0.4.0",
-    "video.js": "~4.6.4"
+    "npm-run-all": "^3.1.0",
+    "@hola.org/video.js": ">=5.10.2-16 <5.10.2"
   }
 }
