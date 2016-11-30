@@ -2,7 +2,7 @@
   "name": "@hola.org/videojs-osmf",
   "version": "0.0.0-33",
   "description": "A Video.js media controller for OSMF",
-  "main": "videojs-osmf.js",
+  "main": "dist/videojs-osmf.js",
   "scripts": {
     "build": "grunt",
     "login": "c=`npm c ls`; test \"${c#*@hola}\" != \"$c\" || npm login --scope @hola.org",
