@@ -1,6 +1,6 @@
 {
   "name": "@hola.org/videojs-osmf",
-  "version": "0.0.0-33",
+  "version": "0.0.0-34",
   "description": "A Video.js media controller for OSMF",
   "main": "dist/videojs-osmf.js",
   "scripts": {
