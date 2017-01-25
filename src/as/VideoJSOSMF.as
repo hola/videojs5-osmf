@@ -551,6 +551,13 @@ public class VideoJSOSMF extends Sprite {
         var netStream: NetStream = nsLoadTrait.netStream;
 	return netStream.decodedFrames;
 
+      case 'ended':
+        if (!_mediaPlayer)
+	  return;
+        var playTrait: PlayTrait = _mediaPlayer.media.getTrait(MediaTraitType.PLAY) as PlayTrait;
+        return (playTrait.playState == PlayState.STOPPED || playTrait.playState == PlayState.PAUSED) &&
+	  _mediaPlayer.currentTime > 0 && _mediaPlayer.currentTime == _mediaPlayer.duration;
+
       default:
         Console.log('');
         Console.log('Get Prop Called', pPropertyName);
